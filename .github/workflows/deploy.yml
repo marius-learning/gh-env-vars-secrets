@@ -17,7 +17,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}
       - if: steps.cache.outputs.cache-hit != 'true'
         run: make install
-      - run: make start & npx wait-on http-get://127.0.0.1:$PORT
+      - run: make start & npx wait-on --timeout 5000 http-get://127.0.0.1:$PORT
       - env:
           CI: 1
           MONGODB_DB_NAME: events
