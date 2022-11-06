@@ -15,4 +15,4 @@ app.use((req, _res, next) => {
 
 app.use(eventRouter);
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT);
