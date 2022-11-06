@@ -1,0 +1,32 @@
+name: Deployment
+on:
+  # push:
+  #   branches:
+  #     - main
+  #     - dev
+  workflow_dispatch:
+
+jobs:
+  test:
+    environment: qa
+    runs-on: ubuntu-latest
+    env:
+      PORT: 3000
+    steps:
+      - uses: actions/checkout@v3
+      - id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ hashFiles('package-lock.json') }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: make install
+      - run: make start & npx wait-on http://127.0.0.1:$PORT
+      - env:
+          CI: 1
+          MONGODB_DB_NAME: events
+          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          MONGODB_CLUSTER_ADDRESS: ${{ secrets.MONGODB_CLUSTER_ADDRESS }}
+        run: make test
+      - run: make reports
